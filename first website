@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kamolon Osh – Smart Gramovka Panel</title>
+  <style>
+    :root {
+      --bg-1: #030712;
+      --bg-2: #0f172a;
+      --bg-3: #111827;
+      --glass: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.08);
+      --stroke: rgba(255,255,255,0.10);
+      --stroke-2: rgba(255,255,255,0.16);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --green-2: #16a34a;
+      --blue: #38bdf8;
+      --violet: #8b5cf6;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow-lg: 0 25px 55px rgba(0,0,0,0.35);
+      --shadow-md: 0 14px 35px rgba(0,0,0,0.26);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 24%),
+        radial-gradient(circle at top right, rgba(139,92,246,0.14), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(34,197,94,0.16), transparent 24%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      padding: 18px;
+    }
+
+    .app { max-width: 1480px; margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 20px 24px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius-xl);
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 16px;
+    }
+
+    .brand h1 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+    }
+
+    .brand p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .btn, .btn-soft, .btn-danger {
+      border: 1px solid transparent;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      transition: .22s ease;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      color: white;
+      box-shadow: 0 12px 25px rgba(34,197,94,0.28);
+    }
+
+    .btn-soft {
+      background: var(--glass);
+      color: var(--text);
+      border-color: var(--stroke);
+    }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: #fecaca;
+      border-color: rgba(239,68,68,0.22);
+    }
+
+    .btn:hover, .btn-soft:hover, .btn-danger:hover, .card-btn:hover, .sheet-btn:hover, .fab:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--stroke);
+    }
+
+    .crumbs button, .crumbs span {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .crumbs button { cursor: pointer; color: var(--text); }
+    .crumbs .current { color: #86efac; }
+
+    .view { display: none; }
+    .view.active { display: block; animation: rise .25s ease; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.68);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .panel-body {
+      padding: 22px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(56,189,248,0.16), transparent 25%),
+        radial-gradient(circle at 80% 20%, rgba(139,92,246,0.16), transparent 24%),
+        radial-gradient(circle at 30% 80%, rgba(34,197,94,0.16), transparent 24%);
+      pointer-events: none;
+    }
+
+    .hero-card h2 {
+      position: relative;
+      z-index: 1;
+      font-size: 30px;
+      font-weight: 900;
+      max-width: 650px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .hero-card p {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      max-width: 740px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .hero-mini {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mini {
+      padding: 16px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.05);
+      border-radius: 18px;
+    }
+
+    .mini .label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .mini .value { font-size: 23px; font-weight: 900; }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .section-title h3 {
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .branch-card, .category-card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-md);
+      transition: .22s ease;
+    }
+
+    .card-btn {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .branch-name, .category-name {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke-2);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      font-weight: 800;
+      color: #dbeafe;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--stroke);
+    }
+
+    .stat-box .label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .stat-box .num { font-size: 28px; font-weight: 900; }
+
+    .sheet-shell {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .sheet-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .sheet-top h4 {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .sheet-top p {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    .sheet-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .sheet-btn {
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      transition: .2s ease;
+    }
+
+    .table-area {
+      overflow: auto;
+      max-height: 520px;
+      background:
+        linear-gradient(rgba(255,255,255,0.02), rgba(255,255,255,0.02)),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: auto, 120px 100%, 100% 56px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1150px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      border-right: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px;
+      vertical-align: middle;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(15, 23, 42, 0.96);
+      font-size: 13px;
+      font-weight: 900;
+      color: #dbeafe;
+      text-align: left;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255,255,255,0.035);
+    }
+
+    .row-num {
+      width: 60px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .cell-input {
+      width: 100%;
+      border: 1px solid transparent;
+      outline: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+      transition: .18s ease;
+    }
+
+    .cell-input:focus {
+      border-color: rgba(56,189,248,0.45);
+      background: rgba(15,23,42,0.88);
+      box-shadow: 0 0 0 4px rgba(56,189,248,0.12);
+    }
+
+    .total-cell {
+      background: rgba(34,197,94,0.08) !important;
+      border: 1px solid rgba(34,197,94,0.2) !important;
+      color: #bbf7d0;
+      font-weight: 900;
+    }
+
+    .autosave-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.22);
+      color: #bbf7d0;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    .footer-sheet {
+      padding: 16px 20px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      border-top: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .summary-item {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--stroke);
+    }
+
+    .summary-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .summary-item strong {
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .excel-view {
+      margin-top: 16px;
+      padding: 18px;
+      border-top: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .excel-view h5 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 900;
+    }
+
+    .excel-mini-table {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .excel-mini-table table {
+      min-width: 1000px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(56,189,248,0.12);
+      color: #bae6fd;
+      border: 1px solid rgba(56,189,248,0.18);
+    }
+
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 60;
+      border: none;
+      border-radius: 18px;
+      padding: 15px 18px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      color: white;
+      box-shadow: 0 15px 35px rgba(56,189,248,0.28);
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .22s ease;
+    }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      .topbar, .crumbs, #branchesView, #sectionsView, .sheet-actions, .fab { display: none !important; }
+      .panel, .stat-box, .summary-item, .branch-card, .category-card { box-shadow: none; background: #fff; border: 1px solid #ddd; }
+      .view { display: none !important; }
+      #templateView.active { display: block !important; }
+      .table-area { max-height: none; overflow: visible; }
+      th { background: #f1f5f9 !important; color: #000; }
+      .cell-input { border: 1px solid #ddd; color: #000; background: #fff; }
+      .total-cell { color: #000; background: #f0fdf4 !important; }
+    }
+
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 12px; }
+      .topbar { padding: 16px; top: 8px; }
+      .brand h1 { font-size: 25px; }
+      .section-title h3 { font-size: 24px; }
+      .hero-card h2 { font-size: 24px; }
+      .hero-mini { grid-template-columns: 1fr; }
+      .sheet-top { padding: 16px; }
+      .footer-sheet { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Kamolon Osh Smart Gramovka</h1>
+        <p>4 ta filial uchun alohida ichki sahifa, Zal va Dostavka bo'limlari, avtomatik hisob-kitob, Excel ko'rinishidagi pastki jadval va PDF yuklab olish funksiyasi.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn-soft" id="backBtn" style="display:none;">⬅ Orqaga</button>
+        <button class="btn-soft" id="jsonBtn">JSON yuklab olish</button>
+        <button class="btn" id="pdfBtn">PDF yuklab olish</button>
+      </div>
+    </header>
+
+    <nav class="crumbs" id="breadcrumbs"></nav>
+
+    <section id="branchesView" class="view active"></section>
+    <section id="sectionsView" class="view"></section>
+    <section id="templateView" class="view"></section>
+  </div>
+
+  <button class="fab" id="quickPdfBtn" style="display:none;">📄 PDF olish</button>
+
+  <script>
+    const BRANCHES = [
+      "Kamolon Osh Labzak",
+      "Kamolon Osh Parkentiskiy",
+      "Kamolon Osh Drujba",
+      "Kamolon Osh Gulzor"
+    ];
+
+    const CATEGORIES = ["Zal", "Dostavka"];
+
+    const PORTION_TYPES = [
+      "0.5 Osh",
+      "0.7 Osh",
+      "1.0 Osh",
+      "1.2 Osh",
+      "1.5 Osh"
+    ];
+
+    const STORAGE_KEY = "kamolon_osh_smart_gramovka_v2";
+
+    const state = {
+      currentBranch: null,
+      currentCategory: null,
+      data: loadData(),
+      saveTimer: null,
+      lastSavedText: formatTime(new Date())
+    };
+
+    const branchesView = document.getElementById("branchesView");
+    const sectionsView = document.getElementById("sectionsView");
+    const templateView = document.getElementById("templateView");
+    const breadcrumbs = document.getElementById("breadcrumbs");
+    const backBtn = document.getElementById("backBtn");
+    const jsonBtn = document.getElementById("jsonBtn");
+    const pdfBtn = document.getElementById("pdfBtn");
+    const quickPdfBtn = document.getElementById("quickPdfBtn");
+
+    function formatTime(date) {
+      return date.toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function createDefaultData() {
+      const data = {};
+      BRANCHES.forEach(branch => {
+        data[branch] = {};
+        CATEGORIES.forEach(category => {
+          data[branch][category] = PORTION_TYPES.map((name, index) => ({
+            id: crypto.randomUUID(),
+            sana: new Date().toISOString().slice(0, 10),
+            nomi: name,
+            gusht: "",
+            guruch: "",
+            umumiy: "",
+            izoh: index === 0 ? "Standart namunaviy qator" : ""
+          }));
+        });
+      });
+      return data;
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {
+        console.error("Storage error", e);
+      }
+      const fresh = createDefaultData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+      return fresh;
+    }
+
+    function persistData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+      state.lastSavedText = formatTime(new Date());
+    }
+
+    function autoSave() {
+      clearTimeout(state.saveTimer);
+      state.saveTimer = setTimeout(() => {
+        persistData();
+        if (state.currentBranch && state.currentCategory) renderTemplate();
+        else if (state.currentBranch) renderSections();
+        else renderBranches();
+      }, 200);
+    }
+
+    function showView(name) {
+      [branchesView, sectionsView, templateView].forEach(v => v.classList.remove("active"));
+      if (name === "branches") branchesView.classList.add("active");
+      if (name === "sections") sectionsView.classList.add("active");
+      if (name === "template") templateView.classList.add("active");
+      backBtn.style.display = name === "branches" ? "none" : "inline-flex";
+      quickPdfBtn.style.display = name === "template" ? "inline-flex" : "none";
+      renderBreadcrumbs();
+    }
+
+    function renderBreadcrumbs() {
+      const items = [{ label: "Filiallar", action: goHome, current: !state.currentBranch }];
+      if (state.currentBranch) items.push({ label: state.currentBranch, action: () => openBranch(state.currentBranch), current: !state.currentCategory });
+      if (state.currentCategory) items.push({ label: state.currentCategory, current: true });
+
+      breadcrumbs.innerHTML = "";
+      items.forEach((item, index) => {
+        const el = document.createElement(item.current ? "span" : "button");
+        el.textContent = item.label;
+        if (item.current) el.className = "current";
+        else el.addEventListener("click", item.action);
+        breadcrumbs.appendChild(el);
+        if (index < items.length - 1) {
+          const sep = document.createElement("span");
+          sep.textContent = ">";
+          breadcrumbs.appendChild(sep);
+        }
+      });
+    }
+
+    function numeric(value) {
+      return Number(value || 0);
+    }
+
+    function calculateRowTotal(row) {
+      return numeric(row.gusht) + numeric(row.guruch);
+    }
+
+    function sanitizeData() {
+      BRANCHES.forEach(branch => {
+        CATEGORIES.forEach(category => {
+          state.data[branch][category].forEach(row => {
+            if ((row.gusht || row.guruch) && !row.umumiy) row.umumiy = calculateRowTotal(row);
+          });
+        });
+      });
+      persistData();
+    }
+
+    function getBranchSummary(branch) {
+      let jamiQator = 0;
+      let jamiGusht = 0;
+      let jamiGuruch = 0;
+      let jamiOgirlik = 0;
+      let toldirilgan = 0;
+
+      CATEGORIES.forEach(category => {
+        state.data[branch][category].forEach(row => {
+          jamiQator++;
+          jamiGusht += numeric(row.gusht);
+          jamiGuruch += numeric(row.guruch);
+          jamiOgirlik += numeric(row.umumiy);
+          if (row.gusht || row.guruch || row.umumiy) toldirilgan++;
+        });
+      });
+
+      return { jamiQator, jamiGusht, jamiGuruch, jamiOgirlik, toldirilgan };
+    }
+
+    function getCategorySummary(branch, category) {
+      const rows = state.data[branch][category];
+      return {
+        qator: rows.length,
+        jamiGusht: rows.reduce((s, r) => s + numeric(r.gusht), 0),
+        jamiGuruch: rows.reduce((s, r) => s + numeric(r.guruch), 0),
+        jamiOgirlik: rows.reduce((s, r) => s + numeric(r.umumiy), 0),
+        oxirgiSaqlangan: state.lastSavedText
+      };
+    }
+
+    function renderBranches() {
+      const allSummaries = BRANCHES.map(branch => ({ branch, ...getBranchSummary(branch) }));
+      const totalBranch = BRANCHES.length;
+      const totalRows = allSummaries.reduce((s, x) => s + x.jamiQator, 0);
+      const totalFilled = allSummaries.reduce((s, x) => s + x.toldirilgan, 0);
+      const totalWeight = allSummaries.reduce((s, x) => s + x.jamiOgirlik, 0);
+
+      branchesView.innerHTML = `
+        <div class="hero">
+          <div class="panel hero-card">
+            <div class="panel-body">
+              <h2>Filialni bosing va to'g'ridan-to'g'ri o'sha filial ichiga kiring</h2>
+              <p>Har bir filial ichida <b>Zal</b> va <b>Dostavka</b> alohida ochiladi. Ichida 5 xil osh gramovka shabloni, avtomatik umumiy hisob, pastda Excel uslubidagi saqlangan jadval va PDF yuklab olish tugmasi mavjud.</p>
+              <div class="hero-mini">
+                <div class="mini"><div class="label">Jami filiallar</div><div class="value">${totalBranch}</div></div>
+                <div class="mini"><div class="label">Jami qatorlar</div><div class="value">${totalRows}</div></div>
+                <div class="mini"><div class="label">To'ldirilganlar</div><div class="value">${totalFilled}</div></div>
+                <div class="mini"><div class="label">Umumiy og'irlik</div><div class="value">${totalWeight.toLocaleString()} g</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-body">
+              <div class="section-title" style="margin-bottom:10px;">
+                <div>
+                  <h3>Tez imkoniyatlar</h3>
+                  <p>Avto-save, auto hisob, PDF va JSON export tayyor.</p>
+                </div>
+              </div>
+              <div class="pill-row" style="margin-bottom:12px;">
+                <span class="tag">Auto-save yoqilgan</span>
+                <span class="tag">Excel style pastki jadval</span>
+                <span class="tag">PDF print / save</span>
+              </div>
+              <div class="stats-grid" style="margin-bottom:0;">
+                <div class="stat-box"><div class="label">Oxirgi saqlanish</div><div class="num" style="font-size:22px;">${state.lastSavedText}</div></div>
+                <div class="stat-box"><div class="label">Bo'limlar</div><div class="num">${BRANCHES.length * CATEGORIES.length}</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <div>
+            <h3>Filiallar ro'yxati</h3>
+            <p>Quyidagi kartalardan birini tanlang.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          ${allSummaries.map(item => `
+            <div class="branch-card">
+              <button class="card-btn" onclick="openBranch('${item.branch.replace(/'/g, "\\'")}')">
+                <div class="branch-name">${item.branch}</div>
+                <div class="card-desc">Alohida boshqaruv bo'limi. Kirgach Zal va Dostavka ichiga bo'linadi.</div>
+                <div class="pill-row">
+                  <span class="pill">${item.toldirilgan}/${item.jamiQator} to'ldirilgan</span>
+                  <span class="pill">Go'sht: ${item.jamiGusht.toLocaleString()} g</span>
+                  <span class="pill">Guruch: ${item.jamiGuruch.toLocaleString()} g</span>
+                  <span class="pill">Umumiy: ${item.jamiOgirlik.toLocaleString()} g</span>
+                </div>
+              </button>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function openBranch(branch) {
+      state.currentBranch = branch;
+      state.currentCategory = null;
+      renderSections();
+      showView("sections");
+    }
+
+    function renderSections() {
+      const branch = state.currentBranch;
+      sectionsView.innerHTML = `
+        <div class="section-title">
+          <div>
+            <h3>${branch}</h3>
+            <p>Quyidan Zal yoki Dostavka bo'limini tanlang.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          ${CATEGORIES.map(category => {
+            const sum = getCategorySummary(branch, category);
+            return `
+              <div class="category-card">
+                <button class="card-btn" onclick="openCategory('${category}')">
+                  <div class="category-name">${category}</div>
+                  <div class="card-desc">${branch} filialining ${category} bo'limi. Ichida 5 xil osh gramovkasi mavjud.</div>
+                  <div class="pill-row">
+                    <span class="pill">${sum.qator} qator</span>
+                    <span class="pill">Go'sht: ${sum.jamiGusht.toLocaleString()} g</span>
+                    <span class="pill">Guruch: ${sum.jamiGuruch.toLocaleString()} g</span>
+                    <span class="pill">Umumiy: ${sum.jamiOgirlik.toLocaleString()} g</span>
+                  </div>
+                </button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function openCategory(category) {
+      state.currentCategory = category;
+      renderTemplate();
+      showView("template");
+    }
+
+    function updateRow(field, id, value) {
+      const rows = state.data[state.currentBranch][state.currentCategory];
+      const row = rows.find(r => r.id === id);
+      if (!row) return;
+      row[field] = value;
+      row.umumiy = calculateRowTotal(row);
+      autoSave();
+      updateLiveUI(id, row);
+      refreshBottomSummary();
+    }
+
+    function updateLiveUI(id, row) {
+      const totalInput = document.getElementById(`umumiy-${id}`);
+      if (totalInput) totalInput.value = row.umumiy || "";
+      const miniTotal = document.getElementById(`mini-umumiy-${id}`);
+      if (miniTotal) miniTotal.textContent = row.umumiy || 0;
+    }
+
+    function clearRow(id) {
+      const rows = state.data[state.currentBranch][state.currentCategory];
+      const row = rows.find(r => r.id === id);
+      if (!row) return;
+      row.sana = new Date().toISOString().slice(0, 10);
+      row.gusht = "";
+      row.guruch = "";
+      row.umumiy = "";
+      row.izoh = "";
+      autoSave();
+      renderTemplate();
+    }
+
+    function resetTemplate() {
+      state.data[state.currentBranch][state.currentCategory] = PORTION_TYPES.map((name, index) => ({
+        id: crypto.randomUUID(),
+        sana: new Date().toISOString().slice(0, 10),
+        nomi: name,
+        gusht: "",
+        guruch: "",
+        umumiy: "",
+        izoh: index === 0 ? "Standart namunaviy qator" : ""
+      }));
+      autoSave();
+      renderTemplate();
+    }
+
+    function addExtraRow() {
+      state.data[state.currentBranch][state.currentCategory].push({
+        id: crypto.randomUUID(),
+        sana: new Date().toISOString().slice(0, 10),
+        nomi: "Yangi osh turi",
+        gusht: "",
+        guruch: "",
+        umumiy: "",
+        izoh: "Qo'lda qo'shilgan qator"
+      });
+      autoSave();
+      renderTemplate();
+    }
+
+    function removeExtraRow(id) {
+      const rows = state.data[state.currentBranch][state.currentCategory];
+      if (rows.length <= 5) {
+        alert("Kamida 5 ta standart qator qolishi kerak.");
+        return;
+      }
+      state.data[state.currentBranch][state.currentCategory] = rows.filter(r => r.id !== id);
+      autoSave();
+      renderTemplate();
+    }
+
+    function refreshBottomSummary() {
+      const branch = state.currentBranch;
+      const category = state.currentCategory;
+      if (!branch || !category) return;
+      const sum = getCategorySummary(branch, category);
+      const ids = {
+        gusht: document.getElementById("sum-gusht"),
+        guruch: document.getElementById("sum-guruch"),
+        umumiy: document.getElementById("sum-umumiy"),
+        save: document.getElementById("sum-save")
+      };
+      if (ids.gusht) ids.gusht.textContent = `${sum.jamiGusht.toLocaleString()} g`;
+      if (ids.guruch) ids.guruch.textContent = `${sum.jamiGuruch.toLocaleString()} g`;
+      if (ids.umumiy) ids.umumiy.textContent = `${sum.jamiOgirlik.toLocaleString()} g`;
+      if (ids.save) ids.save.textContent = state.lastSavedText;
+    }
+
+    function renderTemplate() {
+      const branch = state.currentBranch;
+      const category = state.currentCategory;
+      const rows = state.data[branch][category];
+      const sum = getCategorySummary(branch, category);
+
+      templateView.innerHTML = `
+        <div class="section-title">
+          <div>
+            <h3>${branch} / ${category}</h3>
+            <p>Go'sht va guruch kiritilishi bilan umumiy og'irlik avtomatik hisoblanadi. Saqlash tugmasi olib tashlangan: hammasi avtomatik saqlanadi.</p>
+          </div>
+          <div class="pill-row">
+            <span class="autosave-status"><span class="dot"></span> Auto-save yoqilgan</span>
+            <span class="tag">Oxirgi saqlangan: <b id="sum-save">${state.lastSavedText}</b></span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box"><div class="label">Qatorlar soni</div><div class="num">${sum.qator}</div></div>
+          <div class="stat-box"><div class="label">Jami go'sht</div><div class="num">${sum.jamiGusht.toLocaleString()} g</div></div>
+          <div class="stat-box"><div class="label">Jami guruch</div><div class="num">${sum.jamiGuruch.toLocaleString()} g</div></div>
+          <div class="stat-box"><div class="label">Jami og'irlik</div><div class="num">${sum.jamiOgirlik.toLocaleString()} g</div></div>
+        </div>
+
+        <div class="panel sheet-shell">
+          <div class="sheet-top">
+            <div>
+              <h4>Asosiy kiritish jadvali</h4>
+              <p>Excel uslubida ishlaydi. Qiymatlarni kiriting, umumiy ustun o'zi hisoblanadi.</p>
+            </div>
+            <div class="sheet-actions">
+              <button class="sheet-btn" onclick="addExtraRow()">+ Yangi qator</button>
+              <button class="sheet-btn" onclick="window.print()">🖨 Print / PDF</button>
+              <button class="sheet-btn" onclick="resetTemplate()">♻ Tozalash</button>
+            </div>
+          </div>
+
+          <div class="table-area">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px;">#</th>
+                  <th style="width:145px;">Sana</th>
+                  <th style="width:200px;">Osh turi</th>
+                  <th style="width:170px;">Go'sht (g)</th>
+                  <th style="width:170px;">Guruch (g)</th>
+                  <th style="width:180px;">Umumiy (g)</th>
+                  <th style="width:210px;">Izoh</th>
+                  <th style="width:130px;">Amal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((row, index) => `
+                  <tr>
+                    <td class="row-num">${index + 1}</td>
+                    <td><input class="cell-input" type="date" value="${row.sana || ""}" oninput="updateRow('sana','${row.id}', this.value)"></td>
+                    <td><input class="cell-input" type="text" value="${escapeHtml(row.nomi || "")}" oninput="updateRow('nomi','${row.id}', this.value)"></td>
+                    <td><input class="cell-input" type="number" min="0" step="1" value="${row.gusht || ""}" placeholder="Go'sht" oninput="updateRow('gusht','${row.id}', this.value)"></td>
+                    <td><input class="cell-input" type="number" min="0" step="1" value="${row.guruch || ""}" placeholder="Guruch" oninput="updateRow('guruch','${row.id}', this.value)"></td>
+                    <td><input id="umumiy-${row.id}" class="cell-input total-cell" type="number" value="${row.umumiy || ""}" readonly></td>
+                    <td><input class="cell-input" type="text" value="${escapeHtml(row.izoh || "")}" placeholder="Izoh" oninput="updateRow('izoh','${row.id}', this.value)"></td>
+                    <td>
+                      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="sheet-btn" onclick="clearRow('${row.id}')">Tozalash</button>
+                        ${index >= 5 ? `<button class="btn-danger" style="padding:10px 12px; font-size:12px;" onclick="removeExtraRow('${row.id}')">O'chirish</button>` : ``}
+                      </div>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="footer-sheet">
+            <div class="summary-item"><span>Jami go'sht</span><strong id="sum-gusht">${sum.jamiGusht.toLocaleString()} g</strong></div>
+            <div class="summary-item"><span>Jami guruch</span><strong id="sum-guruch">${sum.jamiGuruch.toLocaleString()} g</strong></div>
+            <div class="summary-item"><span>Jami og'irlik</span><strong id="sum-umumiy">${sum.jamiOgirlik.toLocaleString()} g</strong></div>
+            <div class="summary-item"><span>Holat</span><strong>Avtomatik saqlanmoqda</strong></div>
+          </div>
+
+          <div class="excel-view">
+            <h5>Pastdagi saqlangan ma'lumotlar (Excel ko'rinishida)</h5>
+            <div class="excel-mini-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Sana</th>
+                    <th>Osh turi</th>
+                    <th>Go'sht (g)</th>
+                    <th>Guruch (g)</th>
+                    <th>Umumiy (g)</th>
+                    <th>Izoh</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map((row, index) => `
+                    <tr>
+                      <td>${index + 1}</td>
+                      <td>${row.sana || "-"}</td>
+                      <td>${escapeHtml(row.nomi || "-")}</td>
+                      <td>${row.gusht || 0}</td>
+                      <td>${row.guruch || 0}</td>
+                      <td id="mini-umumiy-${row.id}">${row.umumiy || 0}</td>
+                      <td>${escapeHtml(row.izoh || "-")}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", "&#39;");
+    }
+
+    function goHome() {
+      state.currentBranch = null;
+      state.currentCategory = null;
+      renderBranches();
+      showView("branches");
+    }
+
+    function goBack() {
+      if (state.currentCategory) {
+        state.currentCategory = null;
+        renderSections();
+        showView("sections");
+      } else if (state.currentBranch) {
+        goHome();
+      }
+    }
+
+    function exportJSON() {
+      persistData();
+      const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "kamolon-osh-gramovka-data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportPDF() {
+      if (!state.currentBranch || !state.currentCategory) {
+        alert("PDF olish uchun avval filial va bo'lim ichiga kiring.");
+        return;
+      }
+      window.print();
+    }
+
+    backBtn.addEventListener("click", goBack);
+    jsonBtn.addEventListener("click", exportJSON);
+    pdfBtn.addEventListener("click", exportPDF);
+    quickPdfBtn.addEventListener("click", exportPDF);
+
+    window.openBranch = openBranch;
+    window.openCategory = openCategory;
+    window.updateRow = updateRow;
+    window.clearRow = clearRow;
+    window.resetTemplate = resetTemplate;
+    window.addExtraRow = addExtraRow;
+    window.removeExtraRow = removeExtraRow;
+
+    sanitizeData();
+    renderBranches();
+    renderBreadcrumbs();
+  </script>
+</body>
+</html>
